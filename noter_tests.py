@@ -39,7 +39,7 @@ class NoterTestCase(unittest.TestCase):
         rv = self.login('admin', 'defaultx')
         assert 'Invalid username and password combination' in rv.data
 
-    def test_note(self):
+    def test_add_note(self):
         self.login('admin', 'default')
         rv = self.app.post('/add', data=dict(
             title='test note',
@@ -49,6 +49,17 @@ class NoterTestCase(unittest.TestCase):
         assert 'No notes so far' not in rv.data
         assert 'test note' in rv.data
         assert 'this is a test note' in rv.data
+
+    def test_view_note(self):
+        self.login('admin', 'default')
+        self.app.post('/add', data=dict(
+            title='spam',
+            entry='eggs',
+            tags='spameggs'), follow_redirects=True)
+        rv = self.app.get('/view/1')
+        assert 'spam' in rv.data
+        assert 'eggs' in rv.data
+        assert 'spameggs' in rv.data
 
 if __name__ == '__main__':
     unittest.main()
