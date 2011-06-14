@@ -16,6 +16,8 @@
   <ul class="notes">
   {% for note in notes %}
     <li><h2>{{ note.title }}</h2>{{ note.entry|safe }}
+  {% else %}
+    <li><em>No notes so far</em></li>
   {% endfor %}
   </ul>
 {% endblock %}
