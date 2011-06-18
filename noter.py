@@ -1,3 +1,8 @@
+# Noter
+#
+# copyright: (c) 2011 by Jon Staley.
+# license: GPLv3, see LICENSE for more details.
+
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash

@@ -1,3 +1,8 @@
+# Noter
+#
+# copyright: (c) 2011 by Jon Staley.
+# license: GPLv3, see LICENSE for more details.
+
 import os
 import noter
 import unittest
