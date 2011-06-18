@@ -32,6 +32,23 @@ def query_db(query, args=(), one=False):
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
+def save_tags(tags, note_id):
+    ''' save all tags to the appropriate tables '''
+    for tag in tags:
+        tag = tag.strip()
+
+        tag_exists = query_db('select * from tags where tag = ?', [tag], one=True)
+
+        if not tag_exists:
+            cur = g.db.execute('insert into tags (tag) values (?)', [tag])
+            tag_id = cur.lastrowid
+        else:
+            tag_id = tag_exists['id']
+
+        g.db.execute('insert into note_tags (note_id, tag_id) values (?, ?)',
+            [note_id, tag_id])
+    g.db.commit()
+
 @app.before_request
 def before_request():
     ''' make database connection is present for each
@@ -56,10 +73,26 @@ def add_note():
     ''' add note entry '''
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into notes (title, entry, tags) values (?, ?, ?)',
-        [request.form['title'], request.form['entry'], request.form['tags']])
+    cur = g.db.execute('insert into notes (title, entry) values (?, ?)',
+        [request.form['title'], request.form['entry']])
+    note_id = cur.lastrowid
     g.db.commit()
+
+    if request.form['tags']:
+        tags = request.form['tags'].split(',')
+        save_tags(tags, note_id)
+
     flash('New note was successflly posted')
+    return redirect(url_for('show_notes'))
+
+@app.route('/remove/<note_id>')
+def remove_note(note_id):
+    ''' remove individual note '''
+    if not session.get('logged_in'):
+        abort(401)
+    g.db.execute('delete from notes where id=?', [note_id])
+    g.db.commit()
+    flash('Note was successfully removed')
     return redirect(url_for('show_notes'))
 
 @app.route('/view/<note_id>')
@@ -67,10 +100,19 @@ def view_note(note_id):
     ''' view individual note '''
     note = query_db('select * from notes where id = ?', [note_id],
                     one=True)
+    tags = query_db('select tags.id, tags.tag from tags, note_tags where note_tags.note_id = ? and note_tags.tag_id = tags.id', [note_id])
+
     if not note:
         abort(404)
 
-    return render_template('view_note.html', note=note)
+    return render_template('view_note.html', note=note, tags=tags)
+
+@app.route('/tag/<tag>')
+def view_tags_notes(tag):
+    notes = query_db('select notes.id, notes.title, notes.entry from notes, tags, note_tags where tags.tag = ? and note_tags.tag_id = tags.id and note_tags.note_id = notes.id', [tag])
+    title = 'Notes for tag: %s' % tag
+
+    return render_template('list_view.html', notes=notes, title=title)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

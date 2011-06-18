@@ -2,7 +2,13 @@
 {% block body %}
   {% if session.logged_in %}
     <h2>{{ note.title }}</h2>
-    <p>{{ note.entry }}</p>
-    <p>{{ note.tags }}</p>
+    <p class="entry">{{ note.entry }}</p>
+    <p class="tags">Tags:
+      {% if tags %}
+        {% for tag in tags %}
+          <a href="{{ url_for('view_tags_notes', tag=tag.tag) }}">{{ tag.tag }}</a>{% if not loop.last %},{% endif %}
+        {% endfor %}
+      {% endif %}</p>
+    <p><a href="{{ url_for('remove_note', note_id=note.id) }}">Delete note</a></p>
   {% endif %}
 {% endblock %}

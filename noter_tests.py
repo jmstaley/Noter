@@ -50,16 +50,51 @@ class NoterTestCase(unittest.TestCase):
         assert 'test note' in rv.data
         assert 'this is a test note' in rv.data
 
+    def test_remove_note(self):
+        self.login('admin', 'default')
+        rv = self.app.post('/add', data=dict(
+            title='test note to remove',
+            entry='this is a test note to remove',
+            tags=''
+        ), follow_redirects=True)
+        assert 'test note to remove' in rv.data
+        rv = self.app.get('/remove/1')
+        assert 'test note to remove' not in rv.data
+
     def test_view_note(self):
         self.login('admin', 'default')
         self.app.post('/add', data=dict(
             title='spam',
             entry='eggs',
-            tags='spameggs'), follow_redirects=True)
+            tags='test, tag'), follow_redirects=True)
         rv = self.app.get('/view/1')
         assert 'spam' in rv.data
         assert 'eggs' in rv.data
-        assert 'spameggs' in rv.data
+        assert 'test' in rv.data
+        assert 'tag' in rv.data
+
+    def test_view_tags_notes(self):
+        self.login('admin', 'default')
+        self.app.post('/add', data=dict(
+            title='first',
+            entry='spam',
+            tags='test, spam'), follow_redirects=True)
+        self.app.post('/add', data=dict(
+            title='second',
+            entry='eggs',
+            tags='test, eggs'), follow_redirects=True)
+        rv = self.app.get('/tag/test')
+        assert 'first' in rv.data
+        assert 'spam' in rv.data
+        assert 'second' in rv.data
+        assert 'eggs' in rv.data
+        rv = self.app.get('/tag/spam')
+        assert 'first' in rv.data
+        assert 'eggs' not in rv.data
+        rv = self.app.get('/tag/eggs')
+        assert 'second' in rv.data
+        assert 'spam' not in rv.data
+
 
 if __name__ == '__main__':
     unittest.main()
