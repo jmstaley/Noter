@@ -4,6 +4,7 @@
 # license: GPLv3, see LICENSE for more details.
 
 import sqlite3
+import bcrypt
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
 from contextlib import closing
@@ -30,6 +31,11 @@ def init_db():
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read())
         db.commit()
+
+def create_user(user, pw_hash):
+    db = connect_db()
+    db.execute('insert into users (username, pw_hash) values (?, ?)', [user, pw_hash])
+    db.commit()
 
 def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
@@ -124,14 +130,21 @@ def login():
     ''' login user '''
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
+        user = query_db('select * from users where username=?',
+                        [request.form['username'],],
+                        one=True)
+        hashed_pwd = bcrypt.hashpw(request.form['password'],
+                                   user['pw_hash'])
+
+        if request.form['username'] != user['username']:
             error = 'Invalid username and password combination'
-        elif request.form['password'] != app.config['PASSWORD']:
+        elif hashed_pwd != user['pw_hash']:
             error = 'Invalid username and password combination'
         else:
             session['logged_in'] = True
             flash('You are logged in')
             return redirect(url_for('show_notes'))
+
     return render_template('login.html', error=error)
 
 @app.route('/logout')
