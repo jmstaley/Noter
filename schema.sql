@@ -5,7 +5,8 @@ drop table if exists notes;
 create table notes (
     id integer primary key autoincrement,
     title string null,
-    entry string  not null
+    html_entry string  not null,
+    raw_entry string not null
 );
 
 drop table if exists tags;
@@ -26,6 +27,6 @@ create table note_tags (
 drop table if exists users;
 create table users (
     id integer primary key autoincrement,
-    username string not null,
+    username string unique not null,
     pw_hash string not null
 );

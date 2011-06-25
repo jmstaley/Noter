@@ -2,7 +2,7 @@
 {% block body %}
   {% if session.logged_in %}
     <h2>{{ note.title }}</h2>
-    <p class="entry">{{ note.entry }}</p>
+    <p class="entry">{{ note.html_entry|safe }}</p>
     <p class="tags">Tags:
       {% if tags %}
         {% for tag in tags %}
@@ -10,5 +10,13 @@
         {% endfor %}
       {% endif %}</p>
     <p><a href="{{ url_for('remove_note', note_id=note.id) }}">Delete note</a></p>
+    <h3>Edit Note</h3>
+    <form action="{{url_for('save_note', note_id=note.id) }}" method="POST">
+      <p><label>Title: </label><input type="text" name="title" value="{{ note.title }}" /></p>
+      <p><label>Entry</lable></p>
+      <textarea name="entry" rows="5" cols="40">{{ note.raw_entry }}</textarea>
+      <p><label>Tags</label><input type="text" name="tags" value="{{ note.tags }}" /></p>
+      <input type="submit" value="Save" />
+    </form>
   {% endif %}
 {% endblock %}

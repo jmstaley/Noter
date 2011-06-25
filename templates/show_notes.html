@@ -15,7 +15,7 @@
   {% endif %}
   <ul class="notes">
   {% for note in notes %}
-    <li><h2><a href="{{ url_for('view_note', note_id=note.id) }}">{{ note.title }}</a></h2>{{ note.entry|safe }}
+    <li><h2><a href="{{ url_for('view_note', note_id=note.id) }}">{{ note.title }}</a></h2>{{ note.html_entry|safe }}
   {% else %}
     <li><em>No notes so far</em></li>
   {% endfor %}
