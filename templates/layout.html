@@ -2,23 +2,32 @@
 <html>
   <head>
     <title>Noter</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='blueprint/screen.css') }}" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="{{ url_for('static', filename='blueprint/print.css') }}" type="text/css" media="print">
+    <!--[if lt IE 8]>
+      <link rel="stylesheet" href="{{ url_for('static', filename='blueprint/ie.css') }}" type="text/css" media="screen, projection">
+    <![endif]-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
   </head>
   <body>
-    <div class="page">
-      <h1>Noter</h1>
-      <div class="metanav">
-      {% if not session.logged_in %}
-        <a href="{{ url_for('login') }}">log in</a>
-      {% else %}
-        <a href="{{ url_for('show_notes') }}">home</a>
-        <a href="{{ url_for('logout') }}">log out</a>
-      {% endif %}
+    <div class="page container">
+      <div class="header span-24">
+        <h1>Noter</h1>
+        <div class="metanav">
+        {% if not session.logged_in %}
+          <a href="{{ url_for('login') }}">log in</a>
+        {% else %}
+          <a href="{{ url_for('show_notes') }}">home</a>
+          <a href="{{ url_for('logout') }}">log out</a>
+        {% endif %}
+        </div>
       </div>
       {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
+        <div class="flash span-24">{{ message }}</div>
       {% endfor %}
-      {% block body %}{% endblock %}
+      <div class="body span-24">
+        {% block body %}{% endblock %}
+      </div>
     </div>
   </body>
 </html>

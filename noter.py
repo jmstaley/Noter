@@ -139,17 +139,20 @@ def login():
         user = query_db('select * from users where username=?',
                         [request.form['username'],],
                         one=True)
-        hashed_pwd = bcrypt.hashpw(request.form['password'],
-                                   user['pw_hash'])
+        if user:
+            hashed_pwd = bcrypt.hashpw(request.form['password'],
+                                       user['pw_hash'])
 
-        if request.form['username'] != user['username']:
-            error = 'Invalid username and password combination'
-        elif hashed_pwd != user['pw_hash']:
-            error = 'Invalid username and password combination'
+            if request.form['username'] != user['username']:
+                error = 'Invalid username and password combination'
+            elif hashed_pwd != user['pw_hash']:
+                error = 'Invalid username and password combination'
+            else:
+                session['logged_in'] = True
+                flash('You are logged in')
+                return redirect(url_for('show_notes'))
         else:
-            session['logged_in'] = True
-            flash('You are logged in')
-            return redirect(url_for('show_notes'))
+            error = 'Invalid username and password combination'
 
     return render_template('login.html', error=error)
 
