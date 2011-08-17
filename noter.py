@@ -78,6 +78,11 @@ def show_notes():
     notes = query_db('select id, title, html_entry from notes order by id desc')
     return render_template('show_notes.html', notes=notes)
 
+@app.route('/add')
+def add_note():
+    ''' add note form '''
+    return render_template('add_note.html')
+
 @app.route('/save', methods=['POST'])
 def save_note():
     ''' save note '''
