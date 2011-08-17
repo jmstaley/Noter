@@ -78,9 +78,9 @@ def show_notes():
     notes = query_db('select id, title, html_entry from notes order by id desc')
     return render_template('show_notes.html', notes=notes)
 
-@app.route('/add', methods=['POST'])
-def add_note():
-    ''' add note entry '''
+@app.route('/save', methods=['POST'])
+def save_note():
+    ''' save note '''
     if not session.get('logged_in'):
         abort(401)
     html_entry =  markdown.markdown(request.form['entry'])
@@ -95,12 +95,6 @@ def add_note():
 
     flash('New note was successflly posted')
     return redirect(url_for('show_notes'))
-
-@app.route('/save/<note_id>')
-def save_note(note_id, method=['POST']):
-    ''' save note '''
-    if not session.get('logged_in'):
-        abort(401)
 
 @app.route('/remove/<note_id>')
 def remove_note(note_id):

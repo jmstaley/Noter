@@ -7,12 +7,15 @@ import os
 import noter
 import unittest
 import tempfile
+import bcrypt
 
 class NoterTestCase(unittest.TestCase):
     def setUp(self):
         self.db_fd, noter.app.config['DATABASE'] = tempfile.mkstemp()
         self.app = noter.app.test_client()
         noter.init_db()
+        passwd = bcrypt.hashpw('default', bcrypt.gensalt())
+        noter.create_user('admin', passwd)
 
     def tearDown(self):
         os.close(self.db_fd)
@@ -44,9 +47,9 @@ class NoterTestCase(unittest.TestCase):
         rv = self.login('admin', 'defaultx')
         assert 'Invalid username and password combination' in rv.data
 
-    def test_add_note(self):
+    def test_save_note(self):
         self.login('admin', 'default')
-        rv = self.app.post('/add', data=dict(
+        rv = self.app.post('/save', data=dict(
             title='test note',
             entry='this is a test note',
             tags=''
@@ -57,7 +60,7 @@ class NoterTestCase(unittest.TestCase):
 
     def test_remove_note(self):
         self.login('admin', 'default')
-        rv = self.app.post('/add', data=dict(
+        rv = self.app.post('/save', data=dict(
             title='test note to remove',
             entry='this is a test note to remove',
             tags=''
@@ -68,7 +71,7 @@ class NoterTestCase(unittest.TestCase):
 
     def test_view_note(self):
         self.login('admin', 'default')
-        self.app.post('/add', data=dict(
+        self.app.post('/save', data=dict(
             title='spam',
             entry='eggs',
             tags='test, tag'), follow_redirects=True)
@@ -80,11 +83,11 @@ class NoterTestCase(unittest.TestCase):
 
     def test_view_tags_notes(self):
         self.login('admin', 'default')
-        self.app.post('/add', data=dict(
+        self.app.post('/save', data=dict(
             title='first',
             entry='spam',
             tags='test, spam'), follow_redirects=True)
-        self.app.post('/add', data=dict(
+        self.app.post('/save', data=dict(
             title='second',
             entry='eggs',
             tags='test, eggs'), follow_redirects=True)
