@@ -44,7 +44,7 @@ def query_db(query, args=(), one=False):
 
 def save_tags(tags, note_id):
     ''' save all tags to the appropriate tables '''
-    # need to get notes existing tag and check for removal
+    # need to get notes existing tag and check for removal (seperate func)
     for tag in tags:
         tag = tag.strip()
 
@@ -56,13 +56,16 @@ def save_tags(tags, note_id):
         else:
             tag_id = tag_exists['id']
 
-        exists_for_note = query_db('select * from note_tags where tag_id = ? and note_id = ?', 
-            [tag_id, note_id], one=True)
-
-        if not exists_for_note:
-            g.db.execute('insert into note_tags (note_id, tag_id) values (?, ?)',
-                [note_id, tag_id])
+        g.db.execute('insert into note_tags (note_id, tag_id) values (?, ?)',
+            [note_id, tag_id])
     g.db.commit()
+
+def get_note_tags(note_id):
+    ''' return a list of a notes tags as strings '''
+    existing_tags = query_db('select tags.tag from tags, note_tags where note_tags.note_id = ? and note_tags.tag_id=tags.id',
+        [int(note_id)])
+    existing_tags = [tag['tag'] for tag in existing_tags]
+    return existing_tags
 
 @app.before_request
 def before_request():
@@ -92,22 +95,30 @@ def add_note():
 @app.route('/save/<note_id>', methods=['POST'])
 def save_note(note_id=None):
     ''' save note '''
+    # TODO: add tag string to note saving
     if not session.get('logged_in'):
         abort(401)
+
+    tags = []
     html_entry =  markdown.markdown(request.form['entry'])
 
     if note_id:
         cur = g.db.execute('update notes set title=?, html_entry=?, raw_entry=? where id=?', 
             [request.form['title'], html_entry, request.form['entry'], note_id])
+        existing_tags = get_note_tags(note_id)
     else:
         cur = g.db.execute('insert into notes (title, html_entry, raw_entry) values (?, ?, ?)',
             [request.form['title'], html_entry, request.form['entry']])
         note_id = cur.lastrowid
 
+    if request.form['tags']:
+        # only send new tags to save
+        tags = request.form['tags'].split(',')
+        tags = [tag.strip() for tag in tags if tag.strip() not in existing_tags]
+
     g.db.commit()
 
-    if request.form['tags']:
-        tags = request.form['tags'].split(',')
+    if tags:
         save_tags(tags, note_id)
 
     flash('New note was successfully posted')
@@ -129,11 +140,15 @@ def view_note(note_id):
     note = query_db('select * from notes where id = ?', [note_id],
                     one=True)
     tags = query_db('select tags.id, tags.tag from tags, note_tags where note_tags.note_id = ? and note_tags.tag_id = tags.id', [note_id])
+    tags_string = ', '.join([tag['tag'] for tag in tags])
 
     if not note:
         abort(404)
 
-    return render_template('view_note.html', note=note, tags=tags)
+    return render_template('view_note.html', 
+                           note=note, 
+                           tags=tags,
+                           tag_string=tags_string)
 
 @app.route('/tag/<tag>')
 def view_tags_notes(tag):
