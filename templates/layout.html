@@ -11,7 +11,7 @@
   </head>
   <body>
     <div class="page container">
-      <div class="header span-24">
+      <div class="header span-24 last">
         <h1>Noter</h1>
         <div class="metanav">
         {% if not session.logged_in %}
@@ -23,10 +23,12 @@
         {% endif %}
         </div>
       </div>
+      <div class="messages span-24 last">
       {% for message in get_flashed_messages() %}
-        <div class="flash span-24">{{ message }}</div>
+        <div class="notice">{{ message }}</div>
       {% endfor %}
-      <div class="body span-24">
+      </div>
+      <div class="body span-24 last">
         {% block body %}{% endblock %}
       </div>
     </div>

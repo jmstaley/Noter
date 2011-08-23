@@ -8,13 +8,11 @@ div.header h1 {
   margin-bottom: 1em; 
 }
 
-.flash { 
-  background: #CEE5F5; 
-  padding: 0.5em;
-  border: 1px solid #AACBE2; 
-}
-
 .error { 
   background: #F0D6D6; 
   padding: 0.5em; 
+}
+
+.note {
+  background-color: #cccccc;
 }

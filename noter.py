@@ -44,6 +44,7 @@ def query_db(query, args=(), one=False):
 
 def save_tags(tags, note_id):
     ''' save all tags to the appropriate tables '''
+    # need to get notes existing tag and check for removal
     for tag in tags:
         tag = tag.strip()
 
@@ -55,8 +56,12 @@ def save_tags(tags, note_id):
         else:
             tag_id = tag_exists['id']
 
-        g.db.execute('insert into note_tags (note_id, tag_id) values (?, ?)',
-            [note_id, tag_id])
+        exists_for_note = query_db('select * from note_tags where tag_id = ? and note_id = ?', 
+            [tag_id, note_id], one=True)
+
+        if not exists_for_note:
+            g.db.execute('insert into note_tags (note_id, tag_id) values (?, ?)',
+                [note_id, tag_id])
     g.db.commit()
 
 @app.before_request
@@ -76,7 +81,7 @@ def after_request(response):
 def show_notes():
     ''' show notes '''
     notes = query_db('select id, title, html_entry from notes order by id desc')
-    return render_template('show_notes.html', notes=notes)
+    return render_template('list_view.html', notes=notes)
 
 @app.route('/add')
 def add_note():
@@ -84,21 +89,28 @@ def add_note():
     return render_template('add_note.html')
 
 @app.route('/save', methods=['POST'])
-def save_note():
+@app.route('/save/<note_id>', methods=['POST'])
+def save_note(note_id=None):
     ''' save note '''
     if not session.get('logged_in'):
         abort(401)
     html_entry =  markdown.markdown(request.form['entry'])
-    cur = g.db.execute('insert into notes (title, html_entry, raw_entry) values (?, ?, ?)',
-        [request.form['title'], html_entry, request.form['entry']])
-    note_id = cur.lastrowid
+
+    if note_id:
+        cur = g.db.execute('update notes set title=?, html_entry=?, raw_entry=? where id=?', 
+            [request.form['title'], html_entry, request.form['entry'], note_id])
+    else:
+        cur = g.db.execute('insert into notes (title, html_entry, raw_entry) values (?, ?, ?)',
+            [request.form['title'], html_entry, request.form['entry']])
+        note_id = cur.lastrowid
+
     g.db.commit()
 
     if request.form['tags']:
         tags = request.form['tags'].split(',')
         save_tags(tags, note_id)
 
-    flash('New note was successflly posted')
+    flash('New note was successfully posted')
     return redirect(url_for('show_notes'))
 
 @app.route('/remove/<note_id>')
