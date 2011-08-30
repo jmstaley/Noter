@@ -13,6 +13,29 @@ div.header h1 {
   padding: 0.5em; 
 }
 
+.box {
+  padding: 1em;
+}
+
 .note {
-  background-color: #cccccc;
+  border: 1px solid #cccccc;
+}
+
+pre {
+  background-color: #000000;
+  color: #ffffff;
+  padding: 5px;
+}
+
+p.tags {
+  text-align: right;
+  margin: 0;
+}
+
+div.note h2 {
+  border-bottom: 1px solid #dddddd;
+}
+
+div.note h2 a {
+  text-decoration: none;
 }
