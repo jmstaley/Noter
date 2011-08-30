@@ -58,6 +58,15 @@ class NoterTestCase(unittest.TestCase):
         assert 'test note' in rv.data
         assert 'this is a test note' in rv.data
 
+        rv = self.app.post('/save/1', data=dict(
+            title='test note',
+            entry='edit note',
+            tags=''
+        ), follow_redirects=True)
+        assert 'test note' in rv.data
+        assert 'this is a test note' not in rv.data
+        assert 'edit note' in rv.data
+
     def test_remove_note(self):
         self.login('admin', 'default')
         rv = self.app.post('/save', data=dict(
