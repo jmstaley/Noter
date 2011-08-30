@@ -35,7 +35,7 @@ class NoterTestCase(unittest.TestCase):
 
     def test_empty_db(self):
         rv = self.app.get('/')
-        assert 'No notes so far' in rv.data
+        assert 'No notes found' in rv.data
 
     def test_login_logout(self):
         rv = self.login('admin', 'default')
@@ -54,7 +54,7 @@ class NoterTestCase(unittest.TestCase):
             entry='this is a test note',
             tags=''
         ), follow_redirects=True)
-        assert 'No notes so far' not in rv.data
+        assert 'No notes found' not in rv.data
         assert 'test note' in rv.data
         assert 'this is a test note' in rv.data
 

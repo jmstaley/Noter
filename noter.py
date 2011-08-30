@@ -99,6 +99,7 @@ def save_note(note_id=None):
     if not session.get('logged_in'):
         abort(401)
 
+    existing_tags = []
     tags = []
     html_entry =  markdown.markdown(request.form['entry'])
 
