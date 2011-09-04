@@ -8,7 +8,7 @@ Usage
 
  1. edit the configuration in the noter.py file
 
- 2. run the noter_setup.py file
+ 2. run the noter_setup.py file or export a NOTER_SETTINGS environment variable pointing to a configuration file.
 
  3. run noter.py file and point browser to http://localhost:5000/
 
