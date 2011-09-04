@@ -1,0 +1,17 @@
+Noter
+=====
+
+A sqlite powered note application
+
+Usage
+-----
+
+ 1. edit the configuration in the noter.py file
+
+ 2. run the noter_setup.py file
+
+ 3. run noter.py file and point browser to http://localhost:5000/
+
+Tests
+-----
+Run noter_tests.py
