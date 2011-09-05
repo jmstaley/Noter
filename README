@@ -3,6 +3,10 @@ Noter
 
 A single user sqlite powered note application
 
+Dependencies
+------------
+See requirements.txt
+
 Usage
 -----
 
