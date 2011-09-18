@@ -1,30 +1,22 @@
 {% extends "layout.html" %}
 {% block body %}
+  <div class="note box">
+    <h2>{{ note.title }}</h2>
+    <div class="entry">{{ note.html_entry|safe }}</div>
+    <hr />
+    <p class="tags">Tags:
+      {% if tags %}
+        {% for tag in tags %}
+          <a href="{{ url_for('view_tags_notes', tag=tag.tag) }}">{{ tag.tag }}</a>{% if not loop.last %},{% endif %}
+        {% endfor %}
+      {% endif %}</p>
+  </div>
   {% if session.logged_in %}
-    <div class="note box">
-      <h2>{{ note.title }}</h2>
-      <div class="entry">{{ note.html_entry|safe }}</div>
-      <hr />
-      <p class="tags">Tags:
-        {% if tags %}
-          {% for tag in tags %}
-            <a href="{{ url_for('view_tags_notes', tag=tag.tag) }}">{{ tag.tag }}</a>{% if not loop.last %},{% endif %}
-          {% endfor %}
-        {% endif %}</p>
-    </div>
     <p><a href="{{ url_for('remove_note', note_id=note.id) }}">Delete note</a></p>
     <hr />
     <h3>Edit Note</h3>
-    <form action="{{url_for('save_note', note_id=note.id) }}" method="POST">
-      <dl>
-        <dt><label>Title: </label></dt>
-        <dd><input type="text" name="title" class="text span-23 last" value="{{ note.title }}" /></dd>
-        <dt><label>Entry</label></dt>
-        <dd><textarea name="entry" rows="5" cols="40" class="span-23 last">{{ note.raw_entry }}</textarea></dd>
-        <dt><label>Tags:</label></dt>
-        <dd><input type="text" name="tags" class="text span-23 last" value="{{ tag_string }}" /></dd>
-        <dd><input type="submit" value="Save" /></dd>
-      </dl>
+    <form action="{{url_for('view_note', note_id=note.id) }}" method="POST">
+      {% include "note_form.html" %}
     </form>
   {% endif %}
 {% endblock %}

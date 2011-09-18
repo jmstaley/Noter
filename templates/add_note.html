@@ -1,16 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
   {% if session.logged_in %}
-    <form action="{{ url_for('save_note') }}" method="post" class="add-entry">
-      <dl>
-        <dt>Title:</dt>
-        <dd><input type="text" size="30" name="title" class="text span-23 last" /></dd>
-        <dt>Entry:</dt>
-        <dd><textarea name="entry" rows="5" cols="40" class="span-23 last"></textarea></dd>
-        <dt>Tags:</dt>
-        <dd><input type="text" size="30" name="tags" class="text span-23 last" /></dd>
-        <dd><input type="submit" value="Add">
-      </dl>
+    {% if form.errors %}
+      <p class="error">
+        {% for field_name, field_errors in form.errors.items() if field_errors %}
+          {% for error in field_errors %}
+            {{ form[field_name].label }}: {{ error }}<br />
+          {% endfor %}
+        {% endfor %}
+      </p>
+    {% endif %}
+    <form action="{{ url_for('add_note') }}" method="post" class="add-entry">
+      {% include "note_form.html" %}
     </form>
   {% endif %}
 {% endblock %}

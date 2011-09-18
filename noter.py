@@ -10,6 +10,8 @@ from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
 from contextlib import closing
 
+from forms import LoginForm, NoteForm
+
 # config
 DATABASE = '/tmp/noter.db'
 DEBUG = True
@@ -41,6 +43,31 @@ def query_db(query, args=(), one=False):
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
+
+def save(form, note_id=None):
+    ''' save or update note '''
+    existing_tags = []
+    tags = []
+    html_entry =  markdown.markdown(form.entry.data)
+
+    if note_id:
+        cur = g.db.execute('update notes set title=?, html_entry=?, raw_entry=? where id=?', 
+            [form.title.data, html_entry, form.entry.data, note_id])
+        existing_tags = get_note_tags(note_id)
+    else:
+        cur = g.db.execute('insert into notes (title, html_entry, raw_entry) values (?, ?, ?)',
+            [form.title.data, html_entry, form.entry.data])
+        note_id = cur.lastrowid
+
+    if form.tags.data:
+        # only send new tags to save
+        tags = form.tags.data.split(',')
+        tags = [tag.strip() for tag in tags if tag.strip() not in existing_tags]
+
+    g.db.commit()
+
+    if tags:
+        save_tags(tags, note_id)
 
 def save_tags(tags, note_id):
     ''' save all tags to the appropriate tables '''
@@ -86,44 +113,16 @@ def show_notes():
     notes = query_db('select id, title, html_entry from notes order by id desc')
     return render_template('list_view.html', notes=notes)
 
-@app.route('/add')
+@app.route('/add', methods=['GET','POST'])
 def add_note():
     ''' add note form '''
-    return render_template('add_note.html')
-
-@app.route('/save', methods=['POST'])
-@app.route('/save/<note_id>', methods=['POST'])
-def save_note(note_id=None):
-    ''' save note '''
-    # TODO: add tag string to note saving
     if not session.get('logged_in'):
         abort(401)
-
-    existing_tags = []
-    tags = []
-    html_entry =  markdown.markdown(request.form['entry'])
-
-    if note_id:
-        cur = g.db.execute('update notes set title=?, html_entry=?, raw_entry=? where id=?', 
-            [request.form['title'], html_entry, request.form['entry'], note_id])
-        existing_tags = get_note_tags(note_id)
-    else:
-        cur = g.db.execute('insert into notes (title, html_entry, raw_entry) values (?, ?, ?)',
-            [request.form['title'], html_entry, request.form['entry']])
-        note_id = cur.lastrowid
-
-    if request.form['tags']:
-        # only send new tags to save
-        tags = request.form['tags'].split(',')
-        tags = [tag.strip() for tag in tags if tag.strip() not in existing_tags]
-
-    g.db.commit()
-
-    if tags:
-        save_tags(tags, note_id)
-
-    flash('New note was successfully posted')
-    return redirect(url_for('show_notes'))
+    form = NoteForm()
+    if form.validate_on_submit():
+        save(form)
+        return redirect(url_for('show_notes'))
+    return render_template('add_note.html', form=form)
 
 @app.route('/remove/<note_id>')
 def remove_note(note_id):
@@ -135,7 +134,7 @@ def remove_note(note_id):
     flash('Note was successfully removed')
     return redirect(url_for('show_notes'))
 
-@app.route('/view/<note_id>')
+@app.route('/view/<note_id>', methods=['GET', 'POST'])
 def view_note(note_id):
     ''' view individual note '''
     note = query_db('select * from notes where id = ?', [note_id],
@@ -145,11 +144,24 @@ def view_note(note_id):
 
     if not note:
         abort(404)
+        
+    form = NoteForm()
+
+    # hack to populate fields until using objects
+    if request.method == 'GET':
+        form.title.data = note['title']
+        form.entry.data = note['raw_entry']
+        form.tags.data = tags_string
+
+    if form.validate_on_submit():
+        save(form, note_id=note_id)
+        flash('Note was successfully saved')
+        return redirect(url_for('show_notes'))
 
     return render_template('view_note.html', 
-                           note=note, 
+                           note=note,
                            tags=tags,
-                           tag_string=tags_string)
+                           form=form)
 
 @app.route('/tag/<tag>')
 def view_tags_notes(tag):
@@ -161,8 +173,9 @@ def view_tags_notes(tag):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     ''' login user '''
+    form = LoginForm()
     error = None
-    if request.method == 'POST':
+    if form.validate_on_submit():
         user = query_db('select * from users where username=?',
                         [request.form['username'],],
                         one=True)
@@ -181,7 +194,7 @@ def login():
         else:
             error = 'Invalid username and password combination'
 
-    return render_template('login.html', error=error)
+    return render_template('login.html', form=form, error=error)
 
 @app.route('/logout')
 def logout():
