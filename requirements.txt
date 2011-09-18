@@ -1,6 +1,8 @@
 Flask==0.7.2
+Flask-WTF==0.5.2
 Jinja2==2.6
 Markdown==2.0.3
+WTForms==0.6.3
 Werkzeug==0.7.1
 py-bcrypt==0.2
 wsgiref==0.1.2
