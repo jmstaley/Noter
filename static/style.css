@@ -39,3 +39,26 @@ div.note h2 {
 div.note h2 a {
   text-decoration: none;
 }
+
+table.codehilitetable {
+  border-collapse: collapse;
+  padding: 0;
+  margin: 0;
+}
+
+table.codehilitetable tr {
+  margin: 0;
+  padding: 0;
+}
+
+table.codehilitetable td {
+  padding: 0;
+}
+
+td.linenos {
+  width: 25px;
+}
+
+.linenodiv {
+  border-right: 1px solid #cccccc;
+}

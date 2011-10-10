@@ -48,7 +48,7 @@ def save(form, note_id=None):
     ''' save or update note '''
     existing_tags = []
     tags = []
-    html_entry =  markdown.markdown(form.entry.data)
+    html_entry =  markdown.markdown(form.entry.data, ['codehilite'])
 
     if note_id:
         cur = g.db.execute('update notes set title=?, html_entry=?, raw_entry=? where id=?', 
