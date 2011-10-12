@@ -12,6 +12,7 @@ import bcrypt
 class NoterTestCase(unittest.TestCase):
     def setUp(self):
         self.db_fd, noter.app.config['DATABASE'] = tempfile.mkstemp()
+        noter.app.config['CSRF_ENABLED'] = False
         self.app = noter.app.test_client()
         noter.init_db()
         passwd = bcrypt.hashpw('default', bcrypt.gensalt())
@@ -24,9 +25,11 @@ class NoterTestCase(unittest.TestCase):
     # helper functions
 
     def login(self, username, password):
-        return self.app.post('/login', data=dict(
+        result = self.app.post('/login', data=dict(
             username=username,
             password=password), follow_redirects=True)
+
+        return result
 
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
@@ -49,7 +52,7 @@ class NoterTestCase(unittest.TestCase):
 
     def test_save_note(self):
         self.login('admin', 'default')
-        rv = self.app.post('/save', data=dict(
+        rv = self.app.post('/add', data=dict(
             title='test note',
             entry='this is a test note',
             tags=''
@@ -58,7 +61,7 @@ class NoterTestCase(unittest.TestCase):
         assert 'test note' in rv.data
         assert 'this is a test note' in rv.data
 
-        rv = self.app.post('/save/1', data=dict(
+        rv = self.app.post('/view/1', data=dict(
             title='test note',
             entry='edit note',
             tags=''
@@ -69,7 +72,7 @@ class NoterTestCase(unittest.TestCase):
 
     def test_remove_note(self):
         self.login('admin', 'default')
-        rv = self.app.post('/save', data=dict(
+        rv = self.app.post('/add', data=dict(
             title='test note to remove',
             entry='this is a test note to remove',
             tags=''
@@ -80,7 +83,7 @@ class NoterTestCase(unittest.TestCase):
 
     def test_view_note(self):
         self.login('admin', 'default')
-        self.app.post('/save', data=dict(
+        self.app.post('/add', data=dict(
             title='spam',
             entry='eggs',
             tags='test, tag'), follow_redirects=True)
@@ -92,23 +95,23 @@ class NoterTestCase(unittest.TestCase):
 
     def test_view_tags_notes(self):
         self.login('admin', 'default')
-        self.app.post('/save', data=dict(
+        self.app.post('/add', data=dict(
             title='first',
             entry='spam',
-            tags='test, spam'), follow_redirects=True)
-        self.app.post('/save', data=dict(
+            tags='test, tag1'), follow_redirects=True)
+        self.app.post('/add', data=dict(
             title='second',
             entry='eggs',
-            tags='test, eggs'), follow_redirects=True)
+            tags='test, tag2'), follow_redirects=True)
         rv = self.app.get('/tag/test')
         assert 'first' in rv.data
         assert 'spam' in rv.data
         assert 'second' in rv.data
         assert 'eggs' in rv.data
-        rv = self.app.get('/tag/spam')
+        rv = self.app.get('/tag/tag1')
         assert 'first' in rv.data
         assert 'eggs' not in rv.data
-        rv = self.app.get('/tag/eggs')
+        rv = self.app.get('/tag/tag2')
         assert 'second' in rv.data
         assert 'spam' not in rv.data
 
