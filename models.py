@@ -2,7 +2,7 @@ from flask import Flask
 from flaskext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)                                                                                                                            
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/sugar.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/notes.db'
 db = SQLAlchemy(app)
 
 tags = db.Table('tags',
