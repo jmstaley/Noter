@@ -1,3 +1,4 @@
+import bcrypt
 from flask import Flask
 from flaskext.sqlalchemy import SQLAlchemy
 
@@ -26,6 +27,21 @@ class User(db.Model):
     def __repr__(self):                                                                                                                          
         return '<User %s>' % self.username
 
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return unicode(self.id)
+
+    def check_login(self, password):
+        return bcrypt.hashpw(password, self.pw_hash)
+
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -34,12 +50,14 @@ class Note(db.Model):
     raw_entry = db.Column(db.Text())
     tags = db.relationship('Tag', secondary=tags,
         backref=db.backref('notes', lazy='dynamic'))
+    created_date = db.Column(db.DateTime())
 
-    def __init__(self, uid, title, html_entry, raw_entry):
+    def __init__(self, uid, title, html_entry, raw_entry, created_date):
         self.uid = uid
         self.title = title
         self.html_entry = html_entry
         self.raw_entry = raw_entry
+        self.created_date = created_date
 
     def __repr__(self):
         return '<Note %s>' % self.title

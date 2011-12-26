@@ -14,5 +14,10 @@ while True:
     if raw_pass != '':
         break
 
+while True:
+    email = raw_input("Admin email?\t").strip()
+    if email != '':
+        break
+
 passwd = bcrypt.hashpw(raw_pass, bcrypt.gensalt())
-create_user(admin, passwd)
+create_user(admin, passwd, email)
