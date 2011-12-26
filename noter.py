@@ -123,9 +123,7 @@ def view_note(note_id):
     ''' view individual note '''
     note = Note.query.get(note_id)
     tags = note.tags
-    from pdb import set_trace; set_trace()
     tags_string = ', '.join([tag['tag'] for tag in tags])
-
     if not note:
         abort(404)
         
