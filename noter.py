@@ -144,8 +144,10 @@ def view_note(note_id):
 
 @app.route('/tag/<tag>')
 def view_tags_notes(tag):
-    notes = query_db('select note.id, note.title, note.html_entry from note, tags, note_tags where tags.tag = ? and note_tags.tag_id = tags.id and note_tags.note_id = note.id', [tag])
+    tag_obj = Tag.query.filter_by(value=tag).first()
     title = 'Notes for tag: %s' % tag
+
+    notes = tag_obj.notes.all()
 
     return render_template('list_view.html', notes=notes, title=title)
 
