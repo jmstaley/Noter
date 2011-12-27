@@ -7,11 +7,11 @@
     <p class="tags">Tags:
       {% if tags %}
         {% for tag in tags %}
-          <a href="{{ url_for('view_tags_notes', tag=tag.tag) }}">{{ tag.tag }}</a>{% if not loop.last %},{% endif %}
+          <a href="{{ url_for('view_tags_notes', tag=tag.value) }}">{{ tag.value }}</a>{% if not loop.last %},{% endif %}
         {% endfor %}
       {% endif %}</p>
   </div>
-  {% if session.logged_in %}
+  {% if current_user.is_authenticated() %}
     <p><a href="{{ url_for('remove_note', note_id=note.id) }}">Delete note</a></p>
     <hr />
     <h3>Edit Note</h3>

@@ -52,11 +52,12 @@ class Note(db.Model):
         backref=db.backref('notes', lazy='dynamic'))
     created_date = db.Column(db.DateTime())
 
-    def __init__(self, uid, title, html_entry, raw_entry, created_date):
+    def __init__(self, uid, title, html_entry, raw_entry, tags, created_date):
         self.uid = uid
         self.title = title
         self.html_entry = html_entry
         self.raw_entry = raw_entry
+        self.tags = tags
         self.created_date = created_date
 
     def __repr__(self):

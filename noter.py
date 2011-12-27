@@ -5,10 +5,11 @@
 
 import markdown
 from datetime import datetime
-from flask import request, session, g, redirect, url_for, \
+from flask import request, g, redirect, url_for, \
     abort, render_template, flash
 from flaskext.login import LoginManager, login_user, logout_user, \
     current_user, login_required
+from sqlalchemy import desc
 
 from forms import LoginForm, NoteForm
 from models import db, app, Note, Tag, User
@@ -45,32 +46,33 @@ def save(form, note_id=None):
     tags = []
     html_entry =  markdown.markdown(form.entry.data, ['codehilite'])
 
-    if note_id:
-        cur = g.db.execute('update note set title=?, html_entry=?, raw_entry=? where id=?', 
-            [form.title.data, html_entry, form.entry.data, note_id])
-        existing_tags = get_note_tags(note_id)
-    else:
-        uid = current_user.id
-        note = Note(uid, 
-                    form.title.data, 
-                    html_entry, 
-                    form.entry.data,
-                    datetime.now())
-        db.session.add(note)
-        db.session.commit()
-        note_id = note.id
-
     if form.tags.data:
         # only send new tags to save
         tags = form.tags.data.split(',')
         tags = [tag.strip() for tag in tags if tag.strip() not in existing_tags]
 
     if tags:
-        save_tags(tags, note_id)
+        nt = save_tags(tags)
 
-def save_tags(tags, note_id):
+    if note_id:
+        cur = g.db.execute('update note set title=?, html_entry=?, raw_entry=? where id=?', 
+            [form.title.data, html_entry, form.entry.data, note_id])
+    else:
+        uid = current_user.id
+        note = Note(uid, 
+                    form.title.data, 
+                    html_entry, 
+                    form.entry.data,
+                    nt,
+                    datetime.now())
+        db.session.add(note)
+        db.session.commit()
+        note_id = note.id
+
+def save_tags(tags):
     ''' save all tags to the appropriate tables '''
     # need to get notes existing tag and check for removal (seperate func)
+    new_tags = []
     for tag in tags:
         tag = tag.strip()
 
@@ -81,35 +83,30 @@ def save_tags(tags, note_id):
             db.session.add(new_tag)
             db.session.commit()
             tag_id = new_tag.id
+            new_tags.append(new_tag)
         else:
             tag_id = tag_exists.id
-
-def get_note_tags(note_id):
-    ''' return a list of a notes tags as strings '''
-    existing_tags = Note.query.get(note_id).tags
-    existing_tags = [tag['tag'] for tag in existing_tags]
-    return existing_tags
+            new_tags.append(tag_exists)
+    return new_tags
 
 @app.route('/')
 def show_notes():
     ''' show notes '''
-    notes = Note.query.order_by('created_date')
+    notes = Note.query.order_by(desc(Note.created_date))
     return render_template('list_view.html', notes=notes)
 
-@app.route('/add', methods=['GET','POST'])
 @login_required
+@app.route('/add', methods=['GET','POST'])
 def add_note():
     ''' add note form '''
-    if not session.get('logged_in'):
-        abort(401)
     form = NoteForm()
     if form.validate_on_submit():
         save(form)
         return redirect(url_for('show_notes'))
     return render_template('add_note.html', form=form)
 
-@app.route('/remove/<note_id>')
 @login_required
+@app.route('/remove/<note_id>')
 def remove_note(note_id):
     ''' remove individual note '''
     note = Note.query.get(note_id)
@@ -123,7 +120,7 @@ def view_note(note_id):
     ''' view individual note '''
     note = Note.query.get(note_id)
     tags = note.tags
-    tags_string = ', '.join([tag['tag'] for tag in tags])
+    tags_string = ', '.join([tag.value for tag in tags])
     if not note:
         abort(404)
         

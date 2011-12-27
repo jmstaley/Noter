@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if session.logged_in %}
+  {% if current_user.is_authenticated() %}
     {% if form.errors %}
       <p class="error">
         {% for field_name, field_errors in form.errors.items() if field_errors %}
