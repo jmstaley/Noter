@@ -42,21 +42,22 @@ def load_user(uid):
 
 def save(form, note_id=None):
     ''' save or update note '''
-    existing_tags = []
     tags = []
     html_entry =  markdown.markdown(form.entry.data, ['codehilite'])
 
     if form.tags.data:
-        # only send new tags to save
         tags = form.tags.data.split(',')
-        tags = [tag.strip() for tag in tags if tag.strip() not in existing_tags]
 
     if tags:
         nt = save_tags(tags)
 
     if note_id:
-        cur = g.db.execute('update note set title=?, html_entry=?, raw_entry=? where id=?', 
-            [form.title.data, html_entry, form.entry.data, note_id])
+        note = Note.query.get(note_id)
+        note.title = form.title.data
+        note.html_entry = html_entry
+        note.raw_entry = form.entry.data
+        note.tags = nt
+        db.session.merge(note)
     else:
         uid = current_user.id
         note = Note(uid, 
@@ -65,9 +66,9 @@ def save(form, note_id=None):
                     form.entry.data,
                     nt,
                     datetime.now())
-        db.session.add(note)
-        db.session.commit()
         note_id = note.id
+        db.session.add(note)
+    db.session.commit()
 
 def save_tags(tags):
     ''' save all tags to the appropriate tables '''
