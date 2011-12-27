@@ -5,7 +5,7 @@
 
 import markdown
 from datetime import datetime
-from flask import request, g, redirect, url_for, \
+from flask import request, redirect, url_for, \
     abort, render_template, flash
 from flaskext.login import LoginManager, login_user, logout_user, \
     current_user, login_required
