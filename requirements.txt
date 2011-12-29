@@ -7,3 +7,5 @@ WTForms==0.6.3
 Werkzeug==0.7.1
 py-bcrypt==0.2
 wsgiref==0.1.2
+Flask-Login==0.1
+Flask-SQLAlchemy==0.15
