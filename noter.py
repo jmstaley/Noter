@@ -72,7 +72,6 @@ def save(form, note_id=None):
 
 def save_tags(tags):
     ''' save all tags to the appropriate tables '''
-    # need to get notes existing tag and check for removal (seperate func)
     new_tags = []
     for tag in tags:
         tag = tag.strip()
@@ -93,7 +92,9 @@ def save_tags(tags):
 @app.route('/')
 def show_notes():
     ''' show notes '''
-    notes = Note.query.order_by(desc(Note.created_date))
+    notes = []
+    if current_user.is_authenticated():
+        notes = Note.query.filter_by(uid=current_user.id).order_by(desc(Note.created_date))
     return render_template('list_view.html', notes=notes)
 
 @login_required
@@ -119,7 +120,7 @@ def remove_note(note_id):
 @app.route('/view/<note_id>', methods=['GET', 'POST'])
 def view_note(note_id):
     ''' view individual note '''
-    note = Note.query.get(note_id)
+    note = Note.query.filter_by(id=note_id, uid=current_user.id).first()
     tags = note.tags
     tags_string = ', '.join([tag.value for tag in tags])
     if not note:

@@ -4,13 +4,17 @@
     <h2>{{ title }}</h2>
   {% endif %}
   <div class="notes">
-    {% for note in notes %}
-      <div class="note box">
-        <h2><a href="{{ url_for('view_note', note_id=note.id) }}">{{ note.title }}</a></h2>
-        {{ note.html_entry|safe }}
-      </div>
+    {% if current_user.is_authenticated() %}
+      {% for note in notes %}
+        <div class="note box">
+          <h2><a href="{{ url_for('view_note', note_id=note.id) }}">{{ note.title }}</a></h2>
+          {{ note.html_entry|safe }}
+        </div>
+      {% else %}
+        <div class="note box"><em>No notes found</em></div>
+      {% endfor %}
     {% else %}
-      <div class="note box"><em>No notes found</em></div>
-    {% endfor %}
+      <div class"box">Please <a href="{{ url_for('login') }}">login</a> or <a href="#">register</a>.</div>
+    {% endif %}
   </div>
 {% endblock %}
