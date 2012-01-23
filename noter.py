@@ -5,27 +5,33 @@
 
 import markdown
 from datetime import datetime
-from flask import request, redirect, url_for, \
+from flask import Flask, request, redirect, url_for, \
     abort, render_template, flash
 from flaskext.login import LoginManager, login_user, logout_user, \
     current_user, login_required
 from sqlalchemy import desc
 
 from forms import LoginForm, NoteForm
-from models import db, app, Note, Tag, User
+from models import db, Note, Tag, User
 
 # config
 DATABASE = '/tmp/noter.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 
-login_manager = LoginManager()                                                                                                                   
-login_manager.setup_app(app)
-login_manager.login_view = '/login'
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/notes.db'
 
 app.config.from_object(__name__)
 
 app.config.from_envvar('NOTER_SETTINGS', silent=True)
+
+login_manager = LoginManager()                                                                                                                   
+login_manager.setup_app(app)
+login_manager.login_view = '/login'
+
+db.init_app(app)
 
 def init_db():
     ''' setup database tables '''

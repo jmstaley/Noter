@@ -1,8 +1,9 @@
 import bcrypt
 import getpass
-from noter import init_db, create_user
+from noter import app, init_db, create_user
 
-init_db()
+with app.test_request_context():
+    init_db()
 
 while True:
     admin = raw_input("Admin username?\t").strip()
@@ -20,4 +21,5 @@ while True:
         break
 
 passwd = bcrypt.hashpw(raw_pass, bcrypt.gensalt())
-create_user(admin, passwd, email)
+with app.test_request_context():
+    create_user(admin, passwd, email)

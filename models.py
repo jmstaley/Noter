@@ -1,10 +1,7 @@
 import bcrypt
-from flask import Flask
 from flaskext.sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)                                                                                                                            
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/notes.db'
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 tags = db.Table('tags',
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
