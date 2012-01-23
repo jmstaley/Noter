@@ -49,7 +49,7 @@ def load_user(uid):
 def save(form, note_id=None):
     ''' save or update note '''
     tags = []
-    html_entry =  markdown.markdown(form.entry.data, ['codehilite'])
+    html_entry =  markdown.markdown(form.raw_entry.data, ['codehilite'])
 
     if form.tags.data:
         tags = form.tags.data.split(',')
@@ -61,7 +61,7 @@ def save(form, note_id=None):
         note = Note.query.get(note_id)
         note.title = form.title.data
         note.html_entry = html_entry
-        note.raw_entry = form.entry.data
+        note.raw_entry = form.raw_entry.data
         note.tags = nt
         db.session.merge(note)
     else:
@@ -69,7 +69,7 @@ def save(form, note_id=None):
         note = Note(uid, 
                     form.title.data, 
                     html_entry, 
-                    form.entry.data,
+                    form.raw_entry.data,
                     nt,
                     datetime.now())
         note_id = note.id
@@ -132,12 +132,11 @@ def view_note(note_id):
     if not note:
         abort(404)
         
-    form = NoteForm()
+    form = NoteForm(obj=note)
 
-    # hack to populate fields until using objects
+    # hack to populate tag field
+    # tags are a list of objects need to hack string into form
     if request.method == 'GET':
-        form.title.data = note.title
-        form.entry.data = note.raw_entry
         form.tags.data = tags_string
 
     if form.validate_on_submit():

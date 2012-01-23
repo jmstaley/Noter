@@ -6,5 +6,5 @@ class LoginForm(Form):
 
 class NoteForm(Form):
     title = TextField('Title', [validators.optional()])
-    entry = TextAreaField('Entry', [validators.required()])
+    raw_entry = TextAreaField('Entry', [validators.required()])
     tags = TextField('Tags', [validators.optional()])
