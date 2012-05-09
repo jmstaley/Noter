@@ -1,7 +1,7 @@
 Noter
 =====
 
-A single user sqlite powered note application
+A sqlite powered note application
 
 Dependencies
 ------------
@@ -10,11 +10,13 @@ See requirements.txt
 Usage
 -----
 
- 1. edit the configuration in the noter.py file
+ 1. edit the configuration in the noter/__init__.py file
 
- 2. run the noter_setup.py file or export a NOTER_SETTINGS environment variable pointing to a configuration file.
+ 2. run python manage.py initdb to setup database
 
- 3. run noter.py file and point browser to http://localhost:5000/
+ 3. run python manage.py createuser -u <username> -p <password> -e <email> to add a user
+
+ 3. run python manage.py runserver and point browser to http://localhost:5000/
 
 Tests
 -----
