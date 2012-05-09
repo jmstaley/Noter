@@ -16,7 +16,7 @@ Usage
 
  3. run python manage.py createuser -u <username> -p <password> -e <email> to add a user
 
- 3. run python manage.py runserver and point browser to http://localhost:5000/
+ 4. run python manage.py runserver and point browser to http://localhost:5000/
 
 Tests
 -----
