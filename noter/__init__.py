@@ -15,7 +15,6 @@ from forms import LoginForm, NoteForm
 from models import db, Note, Tag, User
 
 # config
-DATABASE = '/tmp/noter.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 
@@ -42,13 +41,14 @@ def create_user(user, pw_hash, email):
     db.session.add(new_user)
     db.session.commit()
 
-@login_manager.user_loader                                                                                                                       
+@login_manager.user_loader
 def load_user(uid):
     return User.query.get(uid)
 
 def save(form, note_id=None):
     ''' save or update note '''
     tags = []
+    nt = []
     html_entry =  markdown.markdown(form.raw_entry.data, ['codehilite'])
 
     if form.tags.data:
@@ -159,7 +159,7 @@ def view_tags_notes(tag):
     return render_template('list_view.html', notes=notes, title=title)
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():                                                                                                                                     
+def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
