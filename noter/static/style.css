@@ -62,3 +62,11 @@ td.linenos {
 .linenodiv {
   border-right: 1px solid #cccccc;
 }
+
+.inactive {
+  color: #cccccc;
+}
+
+.page-nav{
+  text-align: right;
+}
