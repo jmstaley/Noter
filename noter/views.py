@@ -103,7 +103,7 @@ def logout():
 
 def get_notes(page_num=1):
     notes = Note.query.filter_by(uid=current_user.id).order_by(desc(Note.created_date))
-    page_notes = notes.paginate(int(page_num), per_page=5)
+    page_notes = notes.paginate(int(page_num), per_page=10)
     return page_notes
 
 def save(form, note_id=None):
