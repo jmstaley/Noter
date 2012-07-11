@@ -40,7 +40,7 @@
         {% endif %}
       </div>
     {% else %}
-      <div class"box">Please <a href="{{ url_for('notes.login') }}">login</a> or <a href="#">register</a>.</div>
+      <div class"box">Please <a href="{{ url_for('notes.login') }}">login</a> or <a href="{{ url_for('notes.signup') }}">register</a>.</div>
     {% endif %}
   </div>
 {% endblock %}

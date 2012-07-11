@@ -101,6 +101,11 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('notes.show_notes'))
 
+@note_views.route('/signup')
+def signup():
+    ''' user registration '''
+    return render_template('signup.html')
+
 def get_notes(page_num=1):
     notes = Note.query.filter_by(uid=current_user.id).order_by(desc(Note.created_date))
     page_notes = notes.paginate(int(page_num), per_page=10)
