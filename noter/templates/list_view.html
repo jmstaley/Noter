@@ -3,9 +3,9 @@
   {% if title %}
     <h2>{{ title }}</h2>
   {% endif %}
-  <div class="notes span-22 last">
+  <div class="notes">
     {% if current_user.is_authenticated() %}
-      <div class="page-nav span-24 last">
+      <div class="page-nav">
         {% if notes.has_prev %}
           <a href="{{ url_for('notes.show_page', page_num=notes.prev_num) }}">Previous</a>
         {% else %}
@@ -19,14 +19,14 @@
         {% endif %}
       </div>
       {% for note in notes.items %}
-        <div class="note box span-23 last">
+        <div class="note box">
           <h2><a href="{{ url_for('notes.view_note', note_id=note.id) }}">{{ note.title }}</a></h2>
           {{ note.html_entry|safe }}
         </div>
       {% else %}
-        <div class="note box span-23 last"><em>No notes found</em></div>
+        <div class="note"><em>No notes found</em></div>
       {% endfor %}
-      <div class="page-nav span-24 last">
+      <div class="page-nav">
         {% if notes.has_prev %}
           <a href="{{ url_for('notes.show_page', page_num=notes.prev_num) }}">Previous</a>
         {% else %}

@@ -19,7 +19,8 @@ def show_notes():
     notes = []
     if current_user.is_authenticated():
         notes = get_notes()
-    return render_template('list_view.html', notes=notes)
+    tags = Tag.query.all()
+    return render_template('list_view.html', notes=notes, tags=tags)
 
 @note_views.route('/<page_num>')
 def show_page(page_num=1):
@@ -80,7 +81,8 @@ def view_tags_notes(tag):
     tag_obj = Tag.query.filter_by(value=tag).first()
     title = 'Notes for tag: %s' % tag
 
-    notes = tag_obj.notes.all()
+    notes = tag_obj.notes
+    notes = notes.paginate(page=1)
 
     return render_template('list_view.html', notes=notes, title=title)
 

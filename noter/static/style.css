@@ -1,72 +1,8 @@
-div.header h1 {
-  border-bottom: 1px solid #000000;
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
 }
 
-.metanav { 
-  text-align: right; 
-  padding: 0.3em;
-  margin-bottom: 1em; 
-}
-
-.error { 
-  background: #F0D6D6; 
-  padding: 0.5em; 
-}
-
-.box {
-  padding: 1em;
-}
-
-.note {
-  border: 1px solid #cccccc;
-}
-
-pre {
-  background-color: #000000;
-  color: #ffffff;
-  padding: 5px;
-}
-
-p.tags {
-  text-align: right;
-  margin: 0;
-}
-
-div.note h2 {
-  border-bottom: 1px solid #dddddd;
-}
-
-div.note h2 a {
-  text-decoration: none;
-}
-
-table.codehilitetable {
-  border-collapse: collapse;
-  padding: 0;
-  margin: 0;
-}
-
-table.codehilitetable tr {
-  margin: 0;
-  padding: 0;
-}
-
-table.codehilitetable td {
-  padding: 0;
-}
-
-td.linenos {
-  width: 25px;
-}
-
-.linenodiv {
-  border-right: 1px solid #cccccc;
-}
-
-.inactive {
-  color: #cccccc;
-}
-
-.page-nav{
-  text-align: right;
+.sidebar-nav {
+  padding: 9px 0;
 }
