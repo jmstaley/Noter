@@ -5,8 +5,8 @@
     <div class="entry">{{ note.html_entry|safe }}</div>
     <hr />
     <p class="tags">Tags:
-      {% if tags %}
-        {% for tag in tags %}
+      {% if note_tags %}
+        {% for tag in note_tags %}
           <a href="{{ url_for('notes.view_tags_notes', tag=tag.value) }}">{{ tag.value }}</a>{% if not loop.last %},{% endif %}
         {% endfor %}
       {% endif %}</p>

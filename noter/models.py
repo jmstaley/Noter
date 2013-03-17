@@ -1,5 +1,7 @@
 import bcrypt
 from flaskext.sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy.orm.session import Session
 
 db = SQLAlchemy()
 
@@ -7,6 +9,12 @@ tags = db.Table('tags',
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
     db.Column('note_id', db.Integer, db.ForeignKey('note.id'))
 )
+
+@event.listens_for(Session, 'after_flush')
+def delete_tag_orphans(session, ctx):
+    session.query(Tag).\
+        filter(~Tag.notes.any()).\
+        delete(synchronize_session=False)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

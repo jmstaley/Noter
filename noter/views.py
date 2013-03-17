@@ -19,8 +19,7 @@ def show_notes():
     notes = []
     if current_user.is_authenticated():
         notes = get_notes()
-    tags = Tag.query.all()
-    return render_template('list_view.html', notes=notes, tags=tags)
+    return render_template('list_view.html', notes=notes)
 
 @note_views.route('/<page_num>')
 def show_page(page_num=1):
@@ -73,7 +72,7 @@ def view_note(note_id):
 
     return render_template('view_note.html', 
                            note=note,
-                           tags=tags,
+                           note_tags=tags,
                            form=form)
 
 @note_views.route('/tag/<tag>')
@@ -107,6 +106,11 @@ def logout():
 def signup():
     ''' user registration '''
     return render_template('signup.html')
+
+@note_views.context_processor
+def get_tags():
+    tags = Tag.query.order_by(Tag.value).all()
+    return dict(tags=tags)
 
 def get_notes(page_num=1):
     notes = Note.query.filter_by(uid=current_user.id).order_by(desc(Note.created_date))
@@ -155,8 +159,6 @@ def save_tags(tags):
         if not tag_exists:
             new_tag = Tag(tag)
             db.session.add(new_tag)
-            db.session.commit()
-            tag_id = new_tag.id
             new_tags.append(new_tag)
         else:
             tag_id = tag_exists.id
