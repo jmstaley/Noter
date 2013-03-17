@@ -53,8 +53,8 @@ def remove_note(note_id):
 def view_note(note_id):
     ''' view individual note '''
     note = Note.query.filter_by(id=note_id, uid=current_user.id).first()
-    tags = note.tags
-    tags_string = ', '.join([tag.value for tag in tags])
+    note_tags = note.tags
+    tags_string = ', '.join([tag.value for tag in note_tags])
     if not note:
         abort(404)
         
@@ -72,7 +72,7 @@ def view_note(note_id):
 
     return render_template('view_note.html', 
                            note=note,
-                           note_tags=tags,
+                           note_tags=note_tags,
                            form=form)
 
 @note_views.route('/tag/<tag>')
@@ -109,8 +109,10 @@ def signup():
 
 @note_views.context_processor
 def get_tags():
-    tags = Tag.query.order_by(Tag.value).all()
-    return dict(tags=tags)
+    all_tags = []
+    if not current_user.is_anonymous():
+        all_tags = Tag.query.join(Tag.notes).filter(Note.uid==current_user.id).order_by(Tag.value).all()
+    return dict(tags=all_tags)
 
 def get_notes(page_num=1):
     notes = Note.query.filter_by(uid=current_user.id).order_by(desc(Note.created_date))
@@ -119,15 +121,15 @@ def get_notes(page_num=1):
 
 def save(form, note_id=None):
     ''' save or update note '''
-    tags = []
+    tags_list = []
     nt = []
     html_entry =  markdown.markdown(form.raw_entry.data, ['codehilite'])
 
     if form.tags.data:
-        tags = form.tags.data.split(',')
+        tags_list = form.tags.data.split(',')
 
-    if tags:
-        nt = save_tags(tags)
+    if tags_list:
+        nt = save_tags(tags_list)
 
     if note_id:
         note = Note.query.get(note_id)
@@ -148,10 +150,10 @@ def save(form, note_id=None):
         db.session.add(note)
     db.session.commit()
 
-def save_tags(tags):
+def save_tags(tags_list):
     ''' save all tags to the note_viewsropriate tables '''
     new_tags = []
-    for tag in tags:
+    for tag in tags_list:
         tag = tag.strip()
 
         tag_exists = Tag.query.filter_by(value=tag).first()
