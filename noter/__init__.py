@@ -13,6 +13,7 @@ from models import db, User
 # config
 DEBUG = True
 SECRET_KEY = 'development key'
+BASE_DIR = '/tmp/'
 
 app = Flask(__name__)
 
@@ -29,6 +30,13 @@ login_manager.login_view = '/login'
 app.register_blueprint(note_views)
 
 db.init_app(app)
+
+if not app.debug:
+    import logging
+    from logging import FileHandler
+    file_handler = FileHandler('/%s/noter.log' % BASE_DIR)
+    file_handler.setLevel(logging.WARNING)
+    app.logger.addHandler(file_handler)
 
 def init_db():
     ''' setup database tables '''
