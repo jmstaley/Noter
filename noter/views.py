@@ -7,12 +7,24 @@ from sqlalchemy import desc
 import markdown
 from datetime import datetime
 
-from forms import LoginForm, NoteForm
-from models import db, Note, Tag, User
+from forms import LoginForm, NoteForm, LinkForm
+from models import db, Note, Tag, User, Link
 
 note_views = Blueprint('notes', __name__,
                        template_folder='templates')
 
+# Link views
+@login_required
+@note_views.route('/add/link', methods=['GET','POST'])
+def add_link():
+    ''' add link form '''
+    form = LinkForm()
+    if form.validate_on_submit():
+        save_link(form)
+        return redirect(url_for('notes.show_notes'))
+    return render_template('add_link.html', form=form)
+
+# Note views
 @note_views.route('/')
 def show_notes():
     ''' show notes '''
@@ -30,12 +42,12 @@ def show_page(page_num=1):
     return render_template('list_view.html', notes=notes)
 
 @login_required
-@note_views.route('/add', methods=['GET','POST'])
+@note_views.route('/add/note', methods=['GET','POST'])
 def add_note():
     ''' add note form '''
     form = NoteForm()
     if form.validate_on_submit():
-        save(form)
+        save_note(form)
         return redirect(url_for('notes.show_notes'))
     return render_template('add_note.html', form=form)
 
@@ -119,7 +131,7 @@ def get_notes(page_num=1):
     page_notes = notes.paginate(int(page_num), per_page=10)
     return page_notes
 
-def save(form, note_id=None):
+def save_note(form, note_id=None):
     ''' save or update note '''
     tags_list = []
     nt = []
@@ -148,6 +160,28 @@ def save(form, note_id=None):
                     datetime.now())
         note_id = note.id
         db.session.add(note)
+    db.session.commit()
+
+def save_link(form, link_id=None):
+    tags_list = []
+    nt = []
+
+    if form.tags.data:
+        tags_list = form.tags.data.split(',')
+
+    if tags_list:
+        nt = save_tags(tags_list)
+
+    if link_id:
+        link = Link.query.get(link_id)
+    else:
+        link = Link()
+
+    link.uid = current_user.id
+    link.title = form.title.data
+    link.url = form.url.data
+
+    db.session.merge(link)
     db.session.commit()
 
 def save_tags(tags_list):

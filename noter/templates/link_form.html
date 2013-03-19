@@ -1,0 +1,10 @@
+      {{ form.csrf }}
+      <dl>
+        <dt>{{ form.title.label }}</dt>
+        <dd>{{ form.title(class="text span-23 last", size="30") }}</dd>
+        <dt>{{ form.url.label }}</dt>
+        <dd>{{ form.url(class="span-23 last", cols="40", rows="5") }}</dd>
+        <dt>{{ form.tags.label }}</dt>
+        <dd>{{ form.tags(class="text span-23 last", size="30") }}</dd>
+        <dd><input type="submit" value="Save">
+      </dl>

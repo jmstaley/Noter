@@ -8,3 +8,8 @@ class NoteForm(Form):
     title = TextField('Title', [validators.optional()])
     raw_entry = TextAreaField('Entry', [validators.required()])
     tags = TextField('Tags', [validators.optional()])
+
+class LinkForm(Form):
+    title = TextField('Title', [validators.required()])
+    url = TextField('URL', [validators.required()])
+    tags = TextField('Tags', [validators.optional()])

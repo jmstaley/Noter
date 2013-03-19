@@ -22,7 +22,8 @@
               {% if not current_user.is_authenticated() %}
                 <li><a href="{{ url_for('notes.login') }}">log in</a></li>
               {% else %}
-                <li><a href="{{ url_for('notes.add_note') }}">+ add</a></li>
+                <li><a href="{{ url_for('notes.add_note') }}">+ add note</a></li>
+                <li><a href="{{ url_for('notes.add_link') }}">+ add link</a></li>
                 <li><a href="{{ url_for('notes.logout') }}">log out</a></li>
               {% endif %}
             </ul>

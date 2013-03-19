@@ -7,7 +7,8 @@ db = SQLAlchemy()
 
 tags = db.Table('tags',
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
-    db.Column('note_id', db.Integer, db.ForeignKey('note.id'))
+    db.Column('note_id', db.Integer, db.ForeignKey('note.id')),
+    db.Column('link_id', db.Integer, db.ForeignKey('link.id'))
 )
 
 @event.listens_for(Session, 'after_flush')
@@ -67,6 +68,24 @@ class Note(db.Model):
 
     def __repr__(self):
         return '<Note %s>' % self.title
+
+class Link(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    title = db.Column(db.String(255))
+    url = db.Column(db.String(255))
+    created_date = db.Column(db.DateTime())
+    tags = db.relationship('Tag', secondary=tags,
+        backref=db.backref('links', lazy='dynamic'))
+
+#    def __init__(self, uid, title, url, created_date):
+#        self.uid = uid
+#        self.title = title
+#        self.url = url
+#        self.created_date = created_date
+
+    def __repr__(self):
+        return '<Link %s>' % self.title
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
