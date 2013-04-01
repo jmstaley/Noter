@@ -5,40 +5,16 @@
   {% endif %}
   <div class="notes">
     {% if current_user.is_authenticated() %}
-      <div class="page-nav">
-        {% if notes.has_prev %}
-          <a href="{{ url_for('notes.show_page', page_num=notes.prev_num) }}">Previous</a>
-        {% else %}
-          <span class="inactive">Previous</span>
-        {% endif %}
-        <span> {{ notes.page }} </span>
-        {% if notes.has_next %}
-          <a href="{{ url_for('notes.show_page', page_num=notes.next_num) }}">Next</a>
-        {% else %}
-          <span class="inactive">Next</span>
-        {% endif %}
-      </div>
+      {% include "pagination.html" %}
       {% for note in notes.items %}
-        <div class="note box">
+        <div class="note well well-small">
           <h2><a href="{{ url_for('notes.view_note', note_id=note.id) }}">{{ note.title }}</a></h2>
           {{ note.html_entry|safe }}
         </div>
       {% else %}
         <div class="note"><em>No notes found</em></div>
       {% endfor %}
-      <div class="page-nav">
-        {% if notes.has_prev %}
-          <a href="{{ url_for('notes.show_page', page_num=notes.prev_num) }}">Previous</a>
-        {% else %}
-          <span class="inactive">Previous</span>
-        {% endif %}
-        <span> {{ notes.page }} </span>
-        {% if notes.has_next %}
-          <a href="{{ url_for('notes.show_page', page_num=notes.next_num) }}">Next</a>
-        {% else %}
-          <span class="inactive">Next</span>
-        {% endif %}
-      </div>
+      {% include "pagination.html" %}
     {% else %}
       <div class"box">Please <a href="{{ url_for('notes.login') }}">login</a> or <a href="{{ url_for('notes.signup') }}">register</a>.</div>
     {% endif %}

@@ -1,0 +1,15 @@
+<div class="pagination">
+  <ul>
+  {% if notes.has_prev %}
+    <li><a href="{{ url_for('notes.show_page', page_num=notes.prev_num) }}"><<</a></li>
+  {% else %}
+    <li class="disabled"><span><<</span></li>
+  {% endif %}
+  <li class="active"><span> {{ notes.page }} </span></li>
+  {% if notes.has_next %}
+    <li><a href="{{ url_for('notes.show_page', page_num=notes.next_num) }}">>></a></li>
+  {% else %}
+    <li class="disabled"><span>>></span></li>
+  {% endif %}
+  </ul>
+</div>
