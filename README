@@ -10,11 +10,11 @@ See requirements.txt
 Usage
 -----
 
- 1. edit the configuration in the noter/__init__.py file
+ 1. edit the configuration in the noter/__init__.py and noter/default_settings.py file
 
- 2. run python manage.py initdb to setup database
+ 2. run alembic upgrade head to setup database
 
- 3. run python manage.py createuser -u <username> -p <password> -e <email> to add a user
+ 3. run python manage.py createuser -p <password> -e <email> to add a user
 
  4. run python manage.py runserver and point browser to http://localhost:5000/
 

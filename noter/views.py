@@ -91,14 +91,14 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         try:
-            user = User.query.filter_by(username=form.username.data).first()
+            user = User.query.filter_by(email=form.email.data).first()
             if user.check_login(form.password.data):
                 login_user(user)
                 return redirect(url_for('notes.show_notes'))
             else:
                 raise Exception
         except:
-            error = 'Username/password incorrect'
+            error = 'Email/password incorrect'
     return render_template('login.html', form=form, error=error)
 
 @note_views.route('/logout')

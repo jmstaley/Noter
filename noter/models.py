@@ -18,19 +18,17 @@ def delete_tag_orphans(session, ctx):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True)
     pw_hash = db.Column(db.String(255))
     email = db.Column(db.String(120))
     created_date = db.Column(db.DateTime())
 
-    def __init__(self, username, pw_hash, email, created_date):
-        self.username = username
+    def __init__(self, pw_hash, email, created_date):
         self.pw_hash = pw_hash
         self.email = email
         self.created_date = created_date
 
     def __repr__(self):                                                                                                                          
-        return '<User %s>' % self.username
+        return '<User %s>' % self.email
 
     def is_active(self):
         return True

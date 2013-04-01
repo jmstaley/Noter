@@ -30,8 +30,8 @@ def init_db():
     ''' setup database tables '''
     db.create_all()
 
-def create_user(user, pw_hash, email):
-    new_user = User(user, pw_hash, email, datetime.now())
+def create_user(pw_hash, email):
+    new_user = User(pw_hash, email, datetime.now())
     db.session.add(new_user)
     db.session.commit()
 

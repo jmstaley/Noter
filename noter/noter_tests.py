@@ -16,7 +16,7 @@ class NoterTestCase(unittest.TestCase):
         self.app = noter.app.test_client()
         noter.init_db()
         passwd = bcrypt.hashpw('default', bcrypt.gensalt())
-        noter.create_user('admin', passwd)
+        noter.create_user('admin@example.com', passwd)
 
     def tearDown(self):
         os.close(self.db_fd)
@@ -24,9 +24,9 @@ class NoterTestCase(unittest.TestCase):
 
     # helper functions
 
-    def login(self, username, password):
+    def login(self, email, password):
         result = self.app.post('/login', data=dict(
-            username=username,
+            email=email,
             password=password), follow_redirects=True)
 
         return result
@@ -41,14 +41,14 @@ class NoterTestCase(unittest.TestCase):
         assert 'No notes found' in rv.data
 
     def test_login_logout(self):
-        rv = self.login('admin', 'default')
+        rv = self.login('admin@example.com', 'default')
         assert 'You are logged in' in rv.data
         rv = self.logout()
         assert 'You were logged out' in rv.data
         rv = self.login('adminx', 'default')
-        assert 'Invalid username and password combination' in rv.data
+        assert 'Email/password incorrect ' in rv.data
         rv = self.login('admin', 'defaultx')
-        assert 'Invalid username and password combination' in rv.data
+        assert 'Email/password incorrect ' in rv.data
 
     def test_save_note(self):
         self.login('admin', 'default')
