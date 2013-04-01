@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Flask
-from flaskext.login import LoginManager
+from flask.ext.login import LoginManager
 
 from views import note_views
 from models import db, User

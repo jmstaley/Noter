@@ -1,4 +1,4 @@
-from flaskext.wtf import Form, TextField, TextAreaField, PasswordField, validators
+from flask.ext.wtf import Form, TextField, TextAreaField, PasswordField, validators
 
 class LoginForm(Form):
     username = TextField('Username', [validators.required()])

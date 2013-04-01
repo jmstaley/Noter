@@ -1,5 +1,5 @@
 import bcrypt
-from flaskext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from sqlalchemy.orm.session import Session
 

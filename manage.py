@@ -1,4 +1,4 @@
-from flaskext.script import Manager
+from flask.ext.script import Manager
 import bcrypt
 from noter import app, db, create_user
 
