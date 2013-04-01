@@ -1,8 +1,3 @@
-# Noter
-#
-# copyright: (c) 2011 by Jon Staley.
-# license: GPLv3, see LICENSE for more details.
-
 from datetime import datetime
 from flask import Flask
 from flaskext.login import LoginManager
@@ -10,17 +5,10 @@ from flaskext.login import LoginManager
 from views import note_views
 from models import db, User
 
-# config
-DEBUG = True
-SECRET_KEY = 'development key'
 BASE_DIR = '/tmp/'
 
 app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/notes.db'
-
-app.config.from_object(__name__)
-
+app.config.from_object('noter.default_settings')
 app.config.from_envvar('NOTER_SETTINGS', silent=True)
 
 login_manager = LoginManager()                                                                                                                   
