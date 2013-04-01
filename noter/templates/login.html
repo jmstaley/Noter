@@ -1,16 +1,7 @@
 {% extends "layout.html" %}
   {% block body %}
     <h2>Login</h2>
-    {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
-    {% if form.errors %}
-      <p class="alert alert-error">
-        {% for field_name, field_errors in form.errors.items() if field_errors %}
-          {% for error in field_errors %}
-            {{ error }}<br />
-          {% endfor %}
-        {% endfor %}
-      </p>
-    {% endif %}
+    {% if error %}<p class="alert alert-error">{{ error }}{% endif %}
     <form action="{{ url_for('notes.login') }}" method="POST">
       {{ form.csrf }}
       <dl>

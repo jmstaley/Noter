@@ -87,13 +87,19 @@ def view_tags_notes(tag):
 
 @note_views.route('/login', methods=['GET', 'POST'])
 def login():
+    error = ''
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user.check_login(form.password.data):
-            login_user(user)
-            return redirect(url_for('notes.show_notes'))
-    return render_template('login.html', form=form)
+        try:
+            user = User.query.filter_by(username=form.username.data).first()
+            if user.check_login(form.password.data):
+                login_user(user)
+                return redirect(url_for('notes.show_notes'))
+            else:
+                raise Exception
+        except:
+            error = 'Username/password incorrect'
+    return render_template('login.html', form=form, error=error)
 
 @note_views.route('/logout')
 def logout():

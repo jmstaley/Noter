@@ -45,7 +45,7 @@ class User(db.Model):
         return unicode(self.id)
 
     def check_login(self, password):
-        return bcrypt.hashpw(password, self.pw_hash)
+        return bcrypt.hashpw(password, self.pw_hash) ==  self.pw_hash
 
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
