@@ -3,10 +3,10 @@
     <h2>Login</h2>
     {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
     {% if form.errors %}
-      <p class="error">
+      <p class="alert alert-error">
         {% for field_name, field_errors in form.errors.items() if field_errors %}
           {% for error in field_errors %}
-            {{ form[field_name].label }}: {{ error }}<br />
+            {{ error }}<br />
           {% endfor %}
         {% endfor %}
       </p>
